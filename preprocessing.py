@@ -21,7 +21,6 @@ XLC = Communication Services
 def importData():
     outputFrame = pd.read_csv('Eth_2021.csv')[['Date', 'Change %']]
     outputFrame.columns = ['Date', 'ETH']
-    print(outputFrame)
     # iterate over files in
     # that directory
     for filename in os.listdir('Data'):
