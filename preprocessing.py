@@ -30,7 +30,12 @@ def importData():
         # want to inner merge b/c markets are closed on weekends and some holidays
         outputFrame = outputFrame.merge(tmpFrame, how='inner', on='Date')
     
+    outputFrame = outputFrame.set_index('Date')
+
+    for col in outputFrame.columns:
+        outputFrame[col] = outputFrame[col].apply(lambda val: float(val[:-1])/100)
+
     return outputFrame
 
 
-importData()
+print(importData())
