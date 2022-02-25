@@ -66,13 +66,15 @@ class LinearRegressionModel:
         print(coefficients)
         return cost, coefficients
 
-lr = LinearRegressionModel(nEpochs=100)
+# I commented this out because I moved it to main.py
 
-dt = preprocessing.importData()
-x = dt.drop(columns=['ETH']).to_numpy()[:-1]
-y = dt['ETH'].to_numpy()[1:]
+# lr = LinearRegressionModel(nEpochs=100)
 
-# print(x)
-# print(y)
+# dt = preprocessing.importData()
+# x = dt.drop(columns=['ETH']).to_numpy()[:-1]
+# y = dt['ETH'].to_numpy()[1:]
 
-lr.fit(x, y)
+# # print(x)
+# # print(y)
+
+# lr.fit(x, y)
