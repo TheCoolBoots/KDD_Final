@@ -3,8 +3,8 @@ from linearRegModel import LinearRegressionModel
 from gradientBoost import GradientBoostingRegressor
 
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import GradientBoostingRegressor as GBR
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import GradientBoostingRegressor as sklearn_GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression as sklearn_LinearRegression
 from sklearn.metrics import mean_squared_error
 
 dt = preprocessing.importData()
@@ -16,10 +16,19 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # linear regression
-lr = LinearRegressionModel(nEpochs=100)
+lr = LinearRegressionModel()
 lr.fit(X_train, y_train)
 
 # gradient boost
-reg = GradientBoostingRegressor()
-reg.fit(X_train, y_train)
-mse = mean_squared_error(y_test, reg.predict(X_test))
+gbr = GradientBoostingRegressor()
+gbr.fit(X_train, y_train)
+mse = mean_squared_error(y_test, gbr.predict(X_test))
+
+
+# sklearn
+sklearn_lr = sklearn_LinearRegression()
+sklearn_lr.fit(X_train, y_train)
+
+sklearn_gbr = sklearn_GradientBoostingRegressor()
+sklearn_gbr.fit(X_train, y_train)
+sklearn_mse = mean_squared_error(y_test, sklearn_gbr.predict(X_test))
