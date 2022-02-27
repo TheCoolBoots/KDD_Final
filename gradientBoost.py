@@ -1,33 +1,41 @@
-'''
-Modify gradient boosting function we did for lab 5
-to accept 
-- initial learner to boost
-- learning rate
-- max trees
-- max tree depth 
-'''
-
 import pandas as pd
 import numpy as np
 import preprocessing
 import copy
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.metrics import mean_squared_error
+import sklearn.metrics
 from sklearn.ensemble import GradientBoostingRegressor as GBR
 
 class GradientBoostingRegressor:
-    def __init__(self, learningRate = .1, n_estimators=100, max_depth=2):
+    def __init__(self, learningRate = .1, n_estimators=100, max_depth=2, loss_function="mean_squared_error"):
+        '''
+            loss_functions:
+            max_error, mean_absolute_error, mean_squared_error, mean_squared_log_error, median_absolute_error, 
+            r2_score, mean_poisson_deviance, mean_gamma_deviance, mean_absolute_percentage_error
+        '''
         self.learningRate = learningRate
         self.n_estimators = n_estimators
         self.max_depth = max_depth
         self.trees = []
+        self.loss_function = loss_function
+        self.loss_functions = {
+            "max_error" : sklearn.metrics.max_error,
+            "mean_absolute_error" : sklearn.metrics.mean_absolute_error,
+            "mean_squared_error" : sklearn.metrics.mean_squared_error,
+            "mean_squared_log_error" : sklearn.metrics.mean_squared_log_error,
+            "median_absolute_error" : sklearn.metrics.median_absolute_error,
+            "r2_score" : sklearn.metrics.r2_score,
+            "mean_poisson_deviance" : sklearn.metrics.mean_poisson_deviance,
+            "mean_gamma_deviance" : sklearn.metrics.mean_gamma_deviance,
+            "mean_absolute_percentage_error" : sklearn.metrics.mean_absolute_percentage_error
+        }
 
     def fit(self, X, y, split_size=0.25):
         X_train, X_test, t_train, t_test = train_test_split(X, y, test_size=split_size)
         X_train2, X_val, t_train2, t_val = train_test_split(X_train, t_train, test_size=split_size)
-        trees,train_RMSEs,val_RMSEs = self.make_trees_boost(X_train2, X_val, t_train2, t_val)
-        self.trees = self.cut_trees(trees,val_RMSEs)
+        trees,train_errors,val_errors = self.make_trees_boost(X_train2, X_val, t_train2, t_val)
+        self.trees = self.cut_trees(trees,val_errors)
 
 
     def make_trees_boost(self, Xtrain, Xval, ytrain, yval):
@@ -40,8 +48,8 @@ class GradientBoostingRegressor:
         yval_pred = h.predict(Xval)
         
         trees = [h]
-        train_RMSEs = [np.sqrt(((ytrain_orig - ytrain_pred))**2).sum()/len(ytrain_orig)] # the root mean square errors for the validation dataset
-        val_RMSEs = [np.sqrt(((yval - yval_pred))**2).sum()/len(yval)] # the root mean square errors for the validation dataset
+        train_errors = [self.loss_functions[self.loss_function](ytrain_orig, ytrain_pred)] # the root mean square errors for the validation dataset
+        val_errors = [self.loss_functions[self.loss_function](yval, yval_pred)] # the root mean square errors for the validation dataset
 
         for i in range(self.n_estimators):
             h = DecisionTreeRegressor(max_depth=self.max_depth)
@@ -51,15 +59,15 @@ class GradientBoostingRegressor:
             yval_pred = yval_pred + self.learningRate * h.predict(Xval)
             
             trees.append(h)
-            train_RMSEs.append(np.sqrt(((ytrain_orig - ytrain_pred))**2).sum()/len(ytrain_orig))
-            val_RMSEs.append(np.sqrt(((yval - yval_pred))**2).sum()/len(yval))
+            train_errors.append(self.loss_functions[self.loss_function](ytrain_orig, ytrain_pred))
+            val_errors.append(self.loss_functions[self.loss_function](yval, yval_pred))
             
-        return trees,train_RMSEs,val_RMSEs
+        return trees,train_errors,val_errors
 
-    def cut_trees(self, trees,val_RMSEs):
+    def cut_trees(self, trees,val_errors):
         # Your solution here that finds the minimum validation score and uses only the trees up to that
-        min_val = min(val_RMSEs)
-        idx_min_val = val_RMSEs.index(min_val)
+        min_val = min(val_errors)
+        idx_min_val = val_errors.index(min_val)
 
         return trees[:idx_min_val + 1]
 
