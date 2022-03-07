@@ -29,7 +29,6 @@ where a = variation in mouse size explained by params
 """
 
 from tkinter import NE
-from black import Line
 import pandas as pd
 import numpy as np
 import preprocessing
