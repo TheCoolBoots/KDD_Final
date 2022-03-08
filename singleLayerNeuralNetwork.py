@@ -20,10 +20,6 @@ class Neuron:
         return input
 
     def predict(self, X:pd.DataFrame):
-        print(self.weights)
-        print(X.iloc[0])
-        print(self.weights.shape)
-        print(X.iloc[0].shape)
         return X.apply(lambda row: self.activation(self.weights.dot(X.iloc[0].values)), axis=1)
 
     def evaluate(self, X_test:pd.DataFrame, y_test:pd.Series):
@@ -33,7 +29,7 @@ class Neuron:
 
     # new weight[i] = old weight[i] - learning rate (n) * (actual - target) * input[i]
 
-    def train(self, X_train:pd.DataFrame, X_val:pd.DataFrame, y_train:pd.Series, y_val:pd.Series):
+    def train(self, X_train:pd.DataFrame, X_val:pd.DataFrame, y_train:pd.Series, y_val:pd.Series, batch_size = 100):
         accuracy = []
         for epoch in range(self.nEpochs):
             predictions = self.predict(X_train)
@@ -41,8 +37,13 @@ class Neuron:
             val_predictions = self.predict(X_val)
             
             # w[i] = w[i] - n * (y - t) * x[i]
-            print(self.weights)
-            self.weights = self.weights - self.n*(predictions - y_train.values) * X_train.values
+            X_batch = X_train.sample(n=batch_size)
+            for i, row in X_batch.iterrows():
+                # X size = (cols, rows)
+                # predictions size = ()
+                self.weights = self.weights - self.n*(predictions[i] - y_train[i]) * row.values
+
+            # print(self.weights)
 
             # print(predictions.shape)
             # print(val_predictions.shape)
@@ -73,3 +74,4 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = 
 
 neuron = Neuron(len(X.columns), .3, 50)
 neuron.train(X_train, X_val, y_train, y_val)
+print(neuron.evaluate(X_test, y_test))
