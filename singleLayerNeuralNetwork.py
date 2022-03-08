@@ -42,7 +42,8 @@ class Neuron:
             
             # w[i] = w[i] - n * (y - t) * x[i]
             print(self.weights)
-            self.weights = self.weights - self.n*(predictions - y_train.values) * X_train.values
+            for i, row in X_train.iterrows():
+                self.weights = self.weights - self.n*(predictions - y_train.values) * row.values
 
             # print(predictions.shape)
             # print(val_predictions.shape)
