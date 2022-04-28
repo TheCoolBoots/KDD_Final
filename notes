@@ -1,0 +1,38 @@
+'''
+new page rank = d * oldPageRank/numUniqueLinks
+when there are no links out:
+    new page rank = d * oldPageRank/n
+add (1-d)/N to every webpate's page rank to ensure population of people stay the same
+'''
+
+
+a: .25
+b: .25
+c: .25
+d: .25
+
+# get an out count for each node
+for node in nodes:
+    cound[node] = 0
+for u,v in G.edges():
+    counts[u] += 1
+
+# get out count for each node
+
+
+for node in counts.keys():
+    #set each page's score to 0
+    for edge in edges[node]:
+        score[node] += d * scores[edge]/counts[edge]
+
+
+# with d = .85, need to add back in .15 into everyone's score
+
+# repeat this loop a bunch of times to get page rank score for each webpage
+
+# how to deal with sinks (pages with no outlinks)
+"""
+make a list of all the sinks
+then after algorithm finishes
+distribute each sink's users to other pages
+"""
