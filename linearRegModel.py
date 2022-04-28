@@ -28,21 +28,21 @@ where a = variation in mouse size explained by params
 
 """
 
-from tkinter import NE
 import pandas as pd
 import numpy as np
-import preprocessing
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+
 
 class LinearRegressionModel:
     def __init__(self, learningRate = .1, nEpochs = 1000):
         self.yIntercept = 0
-        self.params = []
         self.learningRate = learningRate
         self.nEpochs = nEpochs
-        self.coefficients = None
 
     def fit(self, x, y):
         mse, coefficients = self.gradient_descent(x, y, self.learningRate, self.nEpochs)
+        self.coefficients = coefficients
+        self.cost = mse
 
     def gradient_descent(self, x, y, L:float, nepochs):
         m = x.shape[0]
@@ -61,9 +61,21 @@ class LinearRegressionModel:
             h = np.dot(x, coefficients)
             cost[i] = 1/(2*m) * sum(np.square(h - y))
 
-        print(cost)
-        print(coefficients)
+        # print(cost)
+        # print(coefficients)
         return cost, coefficients
+
+    def predict_x(self, x_row:pd.DataFrame):
+        result = x_row.values.dot(np.array(self.coefficients[1:])) + self.coefficients[0]
+        return result
+
+    def predict(self, X:pd.DataFrame):
+        return X.apply(lambda row: self.predict_x(row), axis = 1)
+
+    def evaluate(self, X_test:pd.DataFrame, y_test:pd.Series):
+        predictions = self.predict(X_test) 
+        return mean_squared_error(y_test, predictions), mean_absolute_error(y_test, predictions)
+
 
 # I commented this out because I moved it to main.py
 

@@ -37,7 +37,10 @@ class Neuron:
             val_predictions = self.predict(X_val)
             
             # w[i] = w[i] - n * (y - t) * x[i]
-            X_batch = X_train.sample(n=batch_size)
+            if len(X_train) > batch_size:
+                X_batch = X_train.sample(n=batch_size)
+            else:
+                X_batch = X_train
             for i, row in X_batch.iterrows():
                 # X size = (cols, rows)
                 # predictions size = ()
@@ -56,7 +59,7 @@ class Neuron:
 
             accuracy.append(acc)
             
-            print(f'epoch#{epoch}: MSE = {acc[0]}, MAE = {acc[1]}, val_MSE = {acc[2]}, val_MAE = {acc[3]}')
+            # print(f'epoch#{epoch}: MSE = {acc[0]}, MAE = {acc[1]}, val_MSE = {acc[2]}, val_MAE = {acc[3]}')
         return accuracy
 
 
@@ -74,4 +77,4 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = 
 
 neuron = Neuron(len(X.columns), .3, 50)
 neuron.train(X_train, X_val, y_train, y_val)
-print(neuron.evaluate(X_test, y_test))
+# print(neuron.evaluate(X_test, y_test))

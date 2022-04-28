@@ -3,9 +3,10 @@ from sklearn.preprocessing import StandardScaler
 from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.model_selection import train_test_split
-from sklearn import linear_model
+from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 from matplotlib import pyplot as plt
 import preprocessing
 
@@ -66,7 +67,7 @@ print('keras neural net MSE: ', mse_neural)
 print('keras neural net MAE: ', mae_neural)
 
 # Linear regression
-sklearnLR = linear_model.LinearRegression()
+sklearnLR = LinearRegression()
 sklearnLR.fit(X_train_scaled, y_train)
 slkearnLR_pred = sklearnLR.predict(X_test_scaled)
 sklearnLRMSE = mean_squared_error(y_test, slkearnLR_pred)
@@ -83,6 +84,16 @@ mse_RF = mean_squared_error(y_test, sklearnRF_pred)
 mae_RF = mean_absolute_error(y_test, sklearnRF_pred)
 print('Mean squared error using Random Forest: ', mse_RF)
 print('Mean absolute error Using Random Forest: ', mae_RF)
+
+# Gradient Boosting
+sklearnGB = GradientBoostingRegressor()
+sklearnGB.fit(X_train_scaled, y_train)
+sklearnGB_pred = sklearnGB.predict(X_test_scaled)
+sklearnGBMSE = mean_squared_error(y_test, sklearnGB_pred)
+sklearnGBMAE = mean_absolute_error(y_test, sklearnGB_pred)
+print('Mean squared error using Gradient Boosting: ', sklearnGBMSE)
+print('Mean absolute error using Gradient Boosting: ', sklearnGBMAE)
+
 
 # Feature Importance
 feature_list = list(X.columns)
